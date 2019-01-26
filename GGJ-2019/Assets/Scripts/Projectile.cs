@@ -19,9 +19,9 @@ public class Projectile : MonoBehaviour
         
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.name != "Player")
+        if (other.gameObject.name != "Collision Point")
         {
             var hit = (GameObject)Instantiate(hitPrefab, transform.position, Quaternion.identity);
             Destroy(gameObject);

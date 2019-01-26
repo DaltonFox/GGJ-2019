@@ -84,7 +84,7 @@ MonoBehaviour:
       sampleCount: 10
       frameBlending: 0.01
   eyeAdaptation:
-    m_Enabled: 1
+    m_Enabled: 0
     m_Settings:
       lowPercent: 45
       highPercent: 95
@@ -102,13 +102,13 @@ MonoBehaviour:
     m_Settings:
       bloom:
         intensity: 0.2
-        threshold: 1.1
+        threshold: 1
         softKnee: 0
         radius: 5
         antiFlicker: 1
       lensDirt:
         texture: {fileID: 2800000, guid: a2960ffde020f27409e070d92fb2e00b, type: 3}
-        intensity: 5
+        intensity: 3
   colorGrading:
     m_Enabled: 0
     m_Settings:
@@ -318,13 +318,13 @@ MonoBehaviour:
       size: 2
       luminanceContribution: 0.8
   vignette:
-    m_Enabled: 0
+    m_Enabled: 1
     m_Settings:
       mode: 0
       color: {r: 0, g: 0, b: 0, a: 1}
       center: {x: 0.5, y: 0.5}
-      intensity: 0.275
-      smoothness: 0.25
+      intensity: 0.15
+      smoothness: 0.75
       roundness: 1
       mask: {fileID: 0}
       opacity: 1
