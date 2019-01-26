@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
     private Transform chevron;
     private GameObject target;
 
-    private SphereCollider collider;
+    private SphereCollider col;
     private Vector2 targetDir;
     private bool locked = false;
 
@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
     {
         m_Rigidbody = GetComponent<Rigidbody>();
         target = GameObject.Find("Target");
-        collider = gameObject.transform.Find("Collision Point").GetComponent<SphereCollider>();
+        col = gameObject.transform.Find("Collision Point").GetComponent<SphereCollider>();
         chevron = gameObject.transform.Find("Pivot/Chevron");
         pivot = gameObject.transform.Find("Pivot");
     }
@@ -44,8 +44,6 @@ public class PlayerController : MonoBehaviour
     {
         Time.timeScale = 1.0f;
         Time.fixedDeltaTime = 0.02f * Time.timeScale;
-        transform.localScale.Set(1, 1, 1);
-        target.transform.localScale.Set(1, 1, 1);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -87,7 +85,7 @@ public class PlayerController : MonoBehaviour
             locked = true;
             targetDir = tPos - myPos3;
             targetDir.Normalize();
-            collider.enabled = false;
+            col.enabled = false;
             StartCoroutine(holdSequence(1.25f));
         }
 
@@ -98,7 +96,7 @@ public class PlayerController : MonoBehaviour
             
             Vector2 direction = target - myPos;
             direction.Normalize();
-            GameObject projectile = (GameObject) Instantiate(projectilePrefab, myPos, Quaternion.identity);
+            GameObject projectile = (GameObject) Instantiate(projectilePrefab, new Vector3(myPos.x, myPos.y, -2), Quaternion.identity);
             projectile.GetComponent<Rigidbody>().velocity = direction * projectileSpeed;
 
             Vector2 mousePos = Input.mousePosition;

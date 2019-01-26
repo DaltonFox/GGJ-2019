@@ -23,7 +23,7 @@ public class Projectile : MonoBehaviour
     {
         if (other.gameObject.name != "Collision Point")
         {
-            var hit = (GameObject)Instantiate(hitPrefab, transform.position, Quaternion.identity);
+            //var hit = (GameObject)Instantiate(hitPrefab, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
     }
