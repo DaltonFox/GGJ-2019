@@ -1,6 +1,7 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class MeshGenerator : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class MeshGenerator : MonoBehaviour
     List<List<int>> outlines = new List<List<int>>();
     HashSet<int> checkedVertices = new HashSet<int>();
 
-    public void GenerateMesh(int[,] map, float squareSize)
+    public void GenerateMesh(MapGenerator.TileType[,] map, float squareSize)
     {
         squareGrid = new SquareGrid(map, squareSize);
 
@@ -38,6 +39,38 @@ public class MeshGenerator : MonoBehaviour
 
         Mesh mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
+        HashSet<int> seen = new HashSet<int>();
+        System.Random r = new System.Random(DateTime.UtcNow.Millisecond);
+        for(int i = 0; i < triangles.Count / 3; i++)
+        {
+            float amt = r.Next(0, 1000) / 2000.0f;
+            int a = triangles[i * 3 + 0];
+            int b = triangles[i * 3 + 1];
+            int c = triangles[i * 3 + 2];
+
+            if (seen.Contains(a) || seen.Contains(b) || seen.Contains(c))
+            {
+                continue;
+            }
+
+            seen.Add(a);
+            seen.Add(b);
+            seen.Add(c);
+
+            float zAmt = amt * (r.Next(0, 1) == 1 ? 1 : -1);
+            
+            Vector3 y = vertices[a];
+            y.z += zAmt;
+            vertices[a] = y;
+
+            y = vertices[b];
+            y.z += zAmt;
+            vertices[b] = y;
+
+            y = vertices[c];
+            y.z += zAmt;
+            vertices[c] = y;
+        }
 
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
@@ -83,7 +116,7 @@ public class MeshGenerator : MonoBehaviour
         List<Vector3> wallVertices = new List<Vector3>();
         List<int> wallTriangles = new List<int>();
         Mesh wallMesh = new Mesh();
-        float wallHeight = 5;
+        float wallHeight = -5;
 
         foreach (List<int> outline in outlines)
         {
@@ -280,12 +313,18 @@ public class MeshGenerator : MonoBehaviour
 
     void FollowOutline(int vertexIndex, int outlineIndex)
     {
-        outlines[outlineIndex].Add(vertexIndex);
-        checkedVertices.Add(vertexIndex);
-        int nextVertexIndex = GetConnectedOutlineVertex(vertexIndex);
-        if (nextVertexIndex != -1)
+        for(;;)
         {
-            FollowOutline(nextVertexIndex, outlineIndex);
+            outlines[outlineIndex].Add(vertexIndex);
+            checkedVertices.Add(vertexIndex);
+            int nextVertexIndex = GetConnectedOutlineVertex(vertexIndex);
+            if (nextVertexIndex != -1)
+            {
+                vertexIndex = nextVertexIndex;
+                continue;
+            }
+
+            break;
         }
     }
 
@@ -342,7 +381,7 @@ public class MeshGenerator : MonoBehaviour
     {
         public Square[,] squares;
 
-        public SquareGrid(int[,] map, float squareSize)
+        public SquareGrid(MapGenerator.TileType[,] map, float squareSize)
         {
             int nodeCountX = map.GetLength(0);
             int nodeCountY = map.GetLength(1);
@@ -355,7 +394,7 @@ public class MeshGenerator : MonoBehaviour
                 for (int y = 0; y < nodeCountY; y++)
                 {
                     Vector3 position = new Vector3(-mapWidth / 2 + x * squareSize + squareSize / 2, -mapHeight / 2 + y * squareSize + squareSize / 2, 0);
-                    controlNodes[x, y] = new ControlNode(position, map[x, y] == 1, squareSize);
+                    controlNodes[x, y] = new ControlNode(position, map[x, y] == MapGenerator.TileType.Floor, squareSize);
                 }
             }
 
