@@ -12,11 +12,16 @@ public class PlayerController : MonoBehaviour
 
     public float projectileSpeed;
     public GameObject projectilePrefab;
+    public GameObject muzzlePrefab;
 
+    private Transform pivot;
+    private Transform chevron;
 
     void Start()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
+        chevron = gameObject.transform.Find("Pivot/Chevron");
+        pivot = gameObject.transform.Find("Pivot");
     }
 
     private void FixedUpdate()
@@ -43,7 +48,11 @@ public class PlayerController : MonoBehaviour
 
             Vector2 mousePos = Input.mousePosition;
             Vector3 screenPos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, transform.position.z - Camera.main.transform.position.z));
-            projectile.transform.RotateAroundLocal(new Vector3(0, 0, 1), Mathf.Atan2(screenPos.y - transform.position.y, screenPos.x - transform.position.x));
+            projectile.transform.eulerAngles = new Vector3(0, 0, Mathf.Atan2(screenPos.y - transform.position.y, screenPos.x - transform.position.x) * Mathf.Rad2Deg);
+
+            pivot.transform.eulerAngles = new Vector3(0, 0, Mathf.Atan2(screenPos.y - transform.position.y, screenPos.x - transform.position.x) * Mathf.Rad2Deg);
+            var muzzle = (GameObject)Instantiate(muzzlePrefab, chevron.position, pivot.rotation);
+
         }
 
     }
