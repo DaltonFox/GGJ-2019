@@ -181,6 +181,31 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    class DistanceThing : IComparable
+    {
+        public int Distance;
+        public Room roomA, roomB;
+        public Coord tileA, tileB;
+
+        public DistanceThing(int d, Room ra, Room rb, Coord ta, Coord tb)
+        {
+            Distance = d;
+            roomA = ra;
+            roomB = rb;
+            tileA = ta;
+            tileB = tb;
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj is DistanceThing dt)
+            {
+                return Distance.CompareTo(dt.Distance);
+            }
+            throw new NotImplementedException();
+        }
+    }
+
     void ConnectDeadEndsPass(List<Room> allRooms)
     {
         List<Room> deadEnds = new List<Room>();
@@ -194,9 +219,7 @@ public class MapGenerator : MonoBehaviour
 
         foreach (Room deadEnd in deadEnds)
         {
-            Room closest = null;
-            Coord bestTileA = new Coord(0, 0), bestTileB = new Coord(0, 0);
-            int distance = Int32.MaxValue;
+            List<DistanceThing> things = new List<DistanceThing>();
             foreach (Room room in allRooms)
             {
                 if(deadEnd == room || deadEnd.IsConnected(room))
@@ -211,19 +234,15 @@ public class MapGenerator : MonoBehaviour
                 p2 *= p2;
 
                 int distanceSquaredBetweenRooms = p1 + p2;
-                if (distanceSquaredBetweenRooms < distance)
-                {
-                    distance = distanceSquaredBetweenRooms;
-                    closest = room;
-                    bestTileA = tileA;
-                    bestTileB = tileB;
-                }
+                things.Add(new DistanceThing(distanceSquaredBetweenRooms, deadEnd, room, tileA, tileB));
             }
 
-            if (distance != Int32.MaxValue)
+            things.Sort();
+
+            int index = 3;
+            if (things.Count > index)
             {
-//                Debug.DrawLine(CoordToWorldPoint(bestTileA), CoordToWorldPoint(bestTileB), Color.blue, 10);
-                CreatePassage(deadEnd, closest, bestTileA, bestTileB);
+                CreatePassage(things[index].roomA, things[index].roomB, things[index].tileA, things[index].tileB);
             }
         }
     }

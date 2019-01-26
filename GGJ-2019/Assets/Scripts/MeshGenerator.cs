@@ -72,6 +72,22 @@ public class MeshGenerator : MonoBehaviour
             vertices[c] = y;
         }
 
+//        using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Users\miner\Desktop\GGJ-2019\debugModel.obj"))
+//        {
+//            foreach (Vector3 vertex in vertices)
+//            {
+//                file.WriteLine("v " + vertex.x + " " + vertex.y + " " + vertex.z);
+//            }
+//
+//            for (int i = 0; i < triangles.Count / 3; i++)
+//            {
+//                int a = triangles[i * 3 + 0] + 1;
+//                int b = triangles[i * 3 + 1] + 1;
+//                int c = triangles[i * 3 + 2] + 1;
+//                file.WriteLine("f " + a + " " + b + " " + c);
+//            }
+//        }
+
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
         mesh.RecalculateNormals();
@@ -82,7 +98,7 @@ public class MeshGenerator : MonoBehaviour
         }
         else
         {
-            CreateWallMesh();
+//            CreateWallMesh();
         }
     }
 
