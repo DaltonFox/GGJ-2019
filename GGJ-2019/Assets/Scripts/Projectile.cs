@@ -7,6 +7,7 @@ public class Projectile : MonoBehaviour
 {
 
     public GameObject hitPrefab;
+    public bool isEnemy = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,9 +22,13 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.name != "Collision Point")
+        if (other.gameObject.name != "Collision Point" && isEnemy == false)
         {
             //var hit = (GameObject)Instantiate(hitPrefab, transform.position, Quaternion.identity);
+            Destroy(gameObject);
+        }
+        else if (other.gameObject.name == "Walls" && isEnemy == true)
+        {
             Destroy(gameObject);
         }
     }

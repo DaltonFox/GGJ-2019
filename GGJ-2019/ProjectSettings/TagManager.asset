@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Burst
   - Projectile
+  - Bolt
   layers:
   - Default
   - TransparentFX

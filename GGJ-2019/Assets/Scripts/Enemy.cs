@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
 {
 
     public GameObject hitPrefab;
+    public bool canInteract = true;
 
     // Start is called before the first frame update
     void Start()
@@ -17,19 +18,26 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.tag == "Projectile")
         {
-            var hit = (GameObject)Instantiate(hitPrefab, transform.position, Quaternion.identity);
-            Destroy(gameObject);
+            killMe();
         }
         else if (collision.gameObject.name == "Collision Point")
         {
-            var hit = (GameObject)Instantiate(hitPrefab, transform.position, Quaternion.identity);
-            Destroy(gameObject);
+            killMe();
         }
+    }
+
+    public void killMe()
+    {
+        var hit = (GameObject)Instantiate(hitPrefab, transform.position, Quaternion.identity);
+        Destroy(gameObject);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (canInteract)
+        {
+
+        }
     }
 }
