@@ -269,7 +269,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -1087,6 +1087,7 @@ MonoBehaviour:
   borderSize: 3
   passagewayRadius: 7
   specialZoneRadius: 12
+  roomCenters: []
 --- !u!4 &1756117855
 Transform:
   m_ObjectHideFlags: 0
