@@ -15,6 +15,7 @@ public class Range : MonoBehaviour
     public float reloadRate = 3f;
     private float reload = 0;
     public bool canShoot = true;
+    private AudioSource shoot;
 
     // Start is called before the first frame update
     void Start()
@@ -22,6 +23,7 @@ public class Range : MonoBehaviour
         target = GameObject.Find("Player");
         chevron = gameObject.transform.Find("Pivot/Chevron");
         pivot = gameObject.transform.Find("Pivot");
+        shoot = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -32,6 +34,8 @@ public class Range : MonoBehaviour
 
         if (Vector3.Distance(target.transform.localPosition, transform.localPosition) < 12 && reload <= 0 && canShoot)
         {
+            shoot.pitch = Random.Range(0.975f, 1.25f);
+            shoot.Play();
             Vector2 myPos = new Vector2(transform.position.x, transform.position.y);
             Vector2 t = new Vector2(target.transform.localPosition.x, target.transform.localPosition.y);
 

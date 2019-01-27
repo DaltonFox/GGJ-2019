@@ -122,7 +122,7 @@ public class MapGenerator : MonoBehaviour
         MeshGenerator meshGenerator = GetComponent<MeshGenerator>();
         meshGenerator.GenerateMesh(borderedMap, 1);
 
-        GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>().enabled = true;
+        //GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>().enabled = true;
     }
 
     private List<Room> test;
@@ -635,18 +635,18 @@ public class MapGenerator : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            GameObject player = GameObject.Find("DummyPlayer");
-            player.GetComponent<NavMeshAgent>().enabled = false;
-            player.transform.position = new Vector3(0, 0, -2.5f);
-            GenerateMap();
-        }
-        if (Input.GetMouseButtonDown(1))
-        {
-            NavMeshAgent nma = GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>();
-            nma.SetDestination(CoordToWorldPoint(exitCoord));
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    GameObject player = GameObject.Find("DummyPlayer");
+        //    player.GetComponent<NavMeshAgent>().enabled = false;
+        //    player.transform.position = new Vector3(0, 0, -2.5f);
+        //    GenerateMap();
+        //}
+        //if (Input.GetMouseButtonDown(1))
+        //{
+        //    NavMeshAgent nma = GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>();
+        //    nma.SetDestination(CoordToWorldPoint(exitCoord));
+        //}
     }
 
     class Room : IComparable

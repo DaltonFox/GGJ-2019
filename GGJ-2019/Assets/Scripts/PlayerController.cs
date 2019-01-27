@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour
 
     private Material admissive;
     private float admission;
+    private AudioSource soundMaker;
+    public AudioClip shootSound;
 
     void Start()
     {
@@ -39,6 +41,7 @@ public class PlayerController : MonoBehaviour
         pivot = gameObject.transform.Find("Pivot");
         admissive = transform.Find("Sprite/Glow").gameObject.GetComponent<Renderer>().material;
         admission = admissive.GetFloat("_EmissionGain");
+        soundMaker = GetComponent<AudioSource>();
     }
 
     public bool mid = false;
@@ -223,6 +226,8 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && !locked)
         {
+            soundMaker.pitch = Random.Range(1.15f, 1.5f);
+            soundMaker.PlayOneShot(shootSound);
             Vector2 myPos = new Vector2(transform.position.x, transform.position.y);
             Vector2 target = Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x, Input.mousePosition.y));
             

@@ -28,7 +28,7 @@ public class AudioManager : MonoBehaviour {
 
     public IEnumerator FadeIn(AudioSource audioSource, float FadeTime)
     {
-        float startVolume = 0.05f;
+        float startVolume = 0.075f;
         audioSource.volume = 0;
         audioSource.Play();
 
@@ -56,7 +56,7 @@ public class AudioManager : MonoBehaviour {
     {
         currentVolume = volumeLevels[0];
         StartCoroutine(FadeOut(endLoopSource, 0.5f));
-        StartCoroutine(FadeIn(mainLoopSource, 6f));
+        StartCoroutine(FadeIn(mainLoopSource, 2f));
     }
 
     public void startEndLoop()

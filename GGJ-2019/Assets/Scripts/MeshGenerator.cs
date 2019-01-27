@@ -45,8 +45,8 @@ public class MeshGenerator : MonoBehaviour
         mesh.triangles = triangles.ToArray();
         mesh.RecalculateNormals();
 
-        NavMeshSurface nms = GameObject.Find("Tester").GetComponent<NavMeshSurface>();
-        nms.BuildNavMesh();
+        //NavMeshSurface nms = GameObject.Find("Tester").GetComponent<NavMeshSurface>();
+        //nms.BuildNavMesh();
 
         if (is2D)
         {
