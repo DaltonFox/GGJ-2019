@@ -18,5 +18,9 @@ public class menustart : MonoBehaviour
         {
             SceneManager.LoadScene("SampleScene");
         }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit(0);
+        }
     }
 }

@@ -255,6 +255,11 @@ public class PlayerController : MonoBehaviour
     private bool dying = false;
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("MenuScene");
+        }
+
         health -= drainCost;
         pointLight.intensity = health;
         if (health < 1f && health >= 0.4f)
