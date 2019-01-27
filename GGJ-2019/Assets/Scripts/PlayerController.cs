@@ -5,55 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    private Rigidbody m_Rigidbody;
-    public float max_speed;
-    public float acceleration;
-    private Vector3 movement;
-    private float x, y = 0;
-
-    public float projectileSpeed;
-    public GameObject projectilePrefab;
-    public GameObject muzzlePrefab;
-
-    private Transform pivot;
-    private Transform chevron;
-    private GameObject target;
-
-    private SphereCollider col;
-    private Vector2 targetDir;
-    private AudioManager musicManager;
-    private bool locked = false;
-    private bool ending = false;
-
-    private Material admissive;
-    private float admission;
-    private AudioSource soundMaker;
-    public AudioClip shootSound;
-
-    void Start()
-    {
-        musicManager = GameObject.Find("Music Manager").GetComponent<AudioManager>();
-        musicManager.startMainLoop();
-        m_Rigidbody = GetComponent<Rigidbody>();
-        target = GameObject.Find("Target");
-        col = gameObject.transform.Find("Collision Point").GetComponent<SphereCollider>();
-        chevron = gameObject.transform.Find("Pivot/Chevron");
-        pivot = gameObject.transform.Find("Pivot");
-        admissive = transform.Find("Sprite/Glow").gameObject.GetComponent<Renderer>().material;
-        admission = admissive.GetFloat("_EmissionGain");
-        soundMaker = GetComponent<AudioSource>();
-    }
-
-    public bool mid = false;
-    private void FixedUpdate()
-    {
-        if (m_Rigidbody.velocity.magnitude < max_speed && !locked)
-            m_Rigidbody.AddForce(movement * acceleration);
-        else if (locked && mid && !ending)
-            m_Rigidbody.velocity = targetDir * (max_speed / 4);
-        else if (locked && ending)
-            target.GetComponent<Rigidbody>().velocity = -targetDir * max_speed * 1.5f;
-    }
 
     void endSequence()
     {
@@ -185,23 +136,132 @@ public class PlayerController : MonoBehaviour
         endSequence();
     }
 
+    private Rigidbody m_Rigidbody;
+    public float max_speed;
+    public float acceleration;
+    private Vector3 movement;
+    private float x, y = 0;
+
+    public float projectileSpeed;
+    public GameObject projectilePrefab;
+    public GameObject muzzlePrefab;
+
+    private Transform pivot;
+    private Transform chevron;
+    private GameObject target;
+
+    private SphereCollider col;
+    private Vector2 targetDir;
+    private AudioManager musicManager;
+    private bool locked = false;
+    private bool ending = false;
+
+    private Material admissive;
+    private float admission;
+    private AudioSource soundMaker;
+    public AudioClip shootSound;
+    public bool canWin = false;
+    public float drainCost = 0.0001f;
+    public float health = 1.5f;
+    public float shotCost = 0.01f;
+    public float damageCost = 0.05f;
+    public float wallDamageModifier = 25;
+
+    private GameObject spirit;
+
+    private Light pointLight;
+    private ParticleSystem endEffect;
+    void Start()
+    {
+        musicManager = GameObject.Find("Music Manager").GetComponent<AudioManager>();
+        musicManager.startMainLoop();
+        m_Rigidbody = GetComponent<Rigidbody>();
+        target = GameObject.Find("SubTarget");
+        col = gameObject.transform.Find("Collision Point").GetComponent<SphereCollider>();
+        chevron = gameObject.transform.Find("Pivot/Chevron");
+        pivot = gameObject.transform.Find("Pivot");
+        admissive = transform.Find("Sprite/Glow").gameObject.GetComponent<Renderer>().material;
+        admission = admissive.GetFloat("_EmissionGain");
+        soundMaker = GetComponent<AudioSource>();
+        pointLight = transform.Find("Sprite/Point Light").gameObject.GetComponent<Light>();
+        spirit = transform.Find("Sprite").gameObject;
+        endEffect = transform.Find("Sprite/End").gameObject.GetComponent<ParticleSystem>();
+    }
+
+    public bool mid = false;
+    private void FixedUpdate()
+    {
+        if (m_Rigidbody.velocity.magnitude < max_speed && !locked)
+            m_Rigidbody.AddForce(movement * acceleration);
+        else if (locked && mid && !ending)
+        {
+            m_Rigidbody.velocity = targetDir * (max_speed / 4);
+        }
+            
+        else if (locked && ending)
+        { 
+            target.GetComponent<Rigidbody>().velocity = -targetDir * max_speed * 1.5f;
+        }
+            
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.name == "Map Generator Walls")
+        {
+            health -= drainCost * wallDamageModifier;
+        }
+    }
     private void OnCollisionEnter(Collision collision)
     {
+        if (collision.gameObject.name == "Map Generator Walls")
+        {
+            health -= drainCost * wallDamageModifier * 10;
+        }
         if (collision.gameObject.tag == "Bolt")
         {
+            health -= damageCost;
             Destroy(collision.gameObject);
         }
     }
-
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.name == "Map Generator Walls")
+        {
+            health -= drainCost * wallDamageModifier * 10;
+        }
+    }
+    private bool dying = false;
     void Update()
     {
+        health -= drainCost;
+        pointLight.intensity = health;
+        if (health < 1f && health >= 0.4f)
+            spirit.transform.localScale = new Vector3(health, health, health);
+        if (health <= 0.3f && !dying)
+        {
+            endEffect.Play();
+            dying = true;
+            musicManager.startFade();
+        }
+        if (health <= 0.1f)
+        {
+            SceneManager.LoadScene("SampleScene");
+        }
+
+        if (dying && health >= 0.35f)
+        {
+            dying = false;
+            musicManager.startMainLoop();
+        }
+
         x = Input.GetAxis("Horizontal");
         y = Input.GetAxis("Vertical");
         movement = new Vector3(x, y, 0);
         
         Vector3 myPos3 = new Vector3(transform.position.x, transform.position.y, 0);
         Vector3 tPos = new Vector3(target.transform.position.x, target.transform.position.y, 0);
-        if (Vector3.Distance(myPos3, tPos) < 6.0f)
+        if (canWin && Vector3.Distance(target.transform.localPosition, transform.localPosition) < 6)
         {
             
             targetDir = tPos - myPos3;
@@ -224,8 +284,9 @@ public class PlayerController : MonoBehaviour
             locked = true;
         }
 
-        if (Input.GetMouseButtonDown(0) && !locked)
+        if (Input.GetMouseButtonDown(0) && !locked && !dying)
         {
+            health -= shotCost;
             soundMaker.pitch = Random.Range(1.15f, 1.5f);
             soundMaker.PlayOneShot(shootSound);
             Vector2 myPos = new Vector2(transform.position.x, transform.position.y);

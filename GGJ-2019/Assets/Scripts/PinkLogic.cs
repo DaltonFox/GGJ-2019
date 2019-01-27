@@ -139,7 +139,7 @@ public class PinkLogic : MonoBehaviour
         {
             if (Vector3.Distance(playerGameObject.transform.position, transform.position) < winDistance)
             {
-                if (GetChanceResult() > winChance)
+                if (GetChanceResult() < winChance)
                 {
                     Win();
                 }
@@ -171,7 +171,7 @@ public class PinkLogic : MonoBehaviour
 
     void Win()
     {
-        Debug.Log("You Win!!!");
+        playerGameObject.GetComponent<PlayerController>().canWin = true;
     }
 
     void NextLevel()
