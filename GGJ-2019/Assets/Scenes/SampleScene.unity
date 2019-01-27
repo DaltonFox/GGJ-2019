@@ -688,7 +688,7 @@ MonoBehaviour:
   mapGenerator: {fileID: 1756117854}
   pinkPathLightPrefab: {fileID: 3349883601421926619, guid: 9ec8e0cb34bb5c545bd5fe90ddb36407,
     type: 3}
-  winChance: 0.1
+  winChance: 0.01
   waitForPlayerChance: 0.4
   spawnLightChance: 0.4
   spawnMimicChance: 0.1
@@ -1044,11 +1044,12 @@ MonoBehaviour:
   squarePrefab: {fileID: 4402589179000754769, guid: 659b5e82d5d35b446a7a61b29eada48e,
     type: 3}
   maxAliveEnemies: 20
-  ghastSpawnChance: 0.25
-  oracleSpawnChance: 0.5
-  squareSpawnChance: 0.25
-  spawnAtPinkChance: 0.4
-  spawnInterval: 2
+  ghastSpawnChance: 0.2
+  oracleSpawnChance: 0.35
+  squareSpawnChance: 0.45
+  spawnAtPinkChance: 0.5
+  spawnInterval: 1.5
+  spawnAround: 60
 --- !u!4 &1852572982
 Transform:
   m_ObjectHideFlags: 0

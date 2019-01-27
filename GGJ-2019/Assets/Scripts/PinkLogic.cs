@@ -87,6 +87,12 @@ public class PinkLogic : MonoBehaviour
             setDestinationOnce = false;
         }
 
+        if (Input.GetKeyDown(KeyCode.Backslash))
+        {
+            Vector3 p = new Vector3(transform.position.x + 3, transform.position.y - 1, transform.position.z);
+            playerGameObject.transform.localPosition = p;
+        }
+
         if (agent.enabled && !setDestinationOnce)
         {
             setDestinationOnce = true;
@@ -149,6 +155,7 @@ public class PinkLogic : MonoBehaviour
         {
             if (Vector3.Distance(playerGameObject.transform.position, transform.position) < runDistance)
             {
+                playerGameObject.GetComponent<PlayerController>().AddHealth(0.5f);
                 GoToNextPoint();
             }
         }
@@ -195,12 +202,14 @@ public class PinkLogic : MonoBehaviour
 
     void Win()
     {
+        playerGameObject.GetComponent<PlayerController>().health = 1.5f;
         Debug.Log("You Win!!!");
         playerGameObject.GetComponent<PlayerController>().canWin = true;
     }
 
     void NextLevel()
     {
+        playerGameObject.GetComponent<PlayerController>().health = 1.5f;
         float px = playerGameObject.transform.position.x;
         float py = playerGameObject.transform.position.y;
         mapGenerator.transform.position = new Vector3(px, py, 0);

@@ -79,8 +79,9 @@ public class EnemySpawner : MonoBehaviour
         {
             return pinkLogic.GetClosestRoom();
         }
+        Vector3[] swag = getNearBySpawns();
 
-        return mapGenerator.roomCenters[spawnerRandom.Next(0, mapGenerator.roomCenters.Length - 1)];
+        return swag[spawnerRandom.Next(0, swag.Length - 1)];
     }
 
     void SpawnEnemy()
@@ -131,6 +132,48 @@ public class EnemySpawner : MonoBehaviour
         }
 
         return false;
+    }
+
+    public float spawnAround;
+
+    class Quick : IComparable
+    {
+        public Vector3 point;
+        public float distance;
+        public Quick(Vector3 p, float d)
+        {
+            point = p;
+            distance = d;
+        }
+        public int CompareTo(object obj)
+        {
+            if (obj is Quick i)
+            {
+                return distance.CompareTo(i.distance);
+            }
+            throw new NotImplementedException();
+        }
+    }
+
+    Vector3[] getNearBySpawns()
+    {
+        List<Quick> all = new List<Quick>();
+        foreach (Vector3 point in mapGenerator.roomCenters)
+        {
+            float dist = Vector3.Distance(player.transform.position, point);
+            
+            all.Add(new Quick(point, dist));
+        }
+        all.Sort();
+        List<Vector3> toReturn = new List<Vector3>();
+        foreach (Quick q in all)
+        {
+            if (q.distance <= spawnAround)
+            {
+                toReturn.Add(q.point);
+            }
+        }
+        return toReturn.ToArray();
     }
 
     EnemyType GetNextAction()

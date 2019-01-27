@@ -229,6 +229,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void AddHealth(float h)
+    {
+        health += h;
+        if (health >= 1.5f)
+            health = 1.5f;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Bolt" && !dying)

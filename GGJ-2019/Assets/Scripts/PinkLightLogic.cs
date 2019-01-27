@@ -52,6 +52,8 @@ public class PinkLightLogic : MonoBehaviour
     {
         if (!despawning && Vector3.Distance(transform.position, player.transform.position) < despawnDistance)
         {
+            player.GetComponent<PlayerController>().AddHealth(0.15f);
+
             despawning = true;
             StartCoroutine(FadeOut(pinkLight));
             StartCoroutine(FadeOut(brightLight));
