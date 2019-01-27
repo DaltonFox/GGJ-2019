@@ -50,6 +50,8 @@ public class MapGenerator : MonoBehaviour
 
     void GenerateMap()
     {
+        SetAgentStates(false);
+
         map = new TileType[width, height];
         RandomFillMap();
 
@@ -125,10 +127,10 @@ public class MapGenerator : MonoBehaviour
         MeshGenerator meshGenerator = GetComponent<MeshGenerator>();
         meshGenerator.GenerateMesh(borderedMap, 1);
 
-        ActivateAgents();
+        SetAgentStates(true);
     }
 
-    void ActivateAgents()
+    void SetAgentStates(bool enabled)
     {
         if (mapAgents != null)
         {
@@ -136,7 +138,7 @@ public class MapGenerator : MonoBehaviour
             {
                 if (mapAgents[i] != null)
                 {
-                    mapAgents[i].enabled = true;
+                    mapAgents[i].enabled = enabled;
                 }
             }
         }
