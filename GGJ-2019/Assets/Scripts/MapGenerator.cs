@@ -52,7 +52,7 @@ public class MapGenerator : MonoBehaviour
         GenerateMap();
     }
 
-    void GenerateMap()
+    public void GenerateMap()
     {
         SetAgentStates(false);
 
@@ -783,17 +783,17 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-//    void OnDrawGizmos()
-//    {
-//        if (roomCenters != null)
-//        {
-//            Gizmos.color = Color.red;
-//            for (int i = 0; i < roomCenters.Length; i++)
-//            {
-//                Gizmos.DrawSphere(roomCenters[i], 1);
-//            }
-//        }
-//    }
+    void OnDrawGizmos()
+    {
+        if (roomCenters != null)
+        {
+            Gizmos.color = Color.red;
+            for (int i = 0; i < roomCenters.Length; i++)
+            {
+                Gizmos.DrawSphere(roomCenters[i], 1);
+            }
+        }
+    }
 
     void DebugMap(TileType[,] tileMap)
     {
@@ -812,6 +812,6 @@ public class MapGenerator : MonoBehaviour
 
     Vector3 CoordToWorldPoint(Coord tile)
     {
-        return new Vector3(-width / 2f + 0.5f + tile.tileX, -height / 2f + 0.5f + tile.tileY, -2);
+        return new Vector3(-width / 2f + 0.5f + tile.tileX + transform.position.x, -height / 2f + 0.5f + tile.tileY + transform.position.y, -2);
     }
 }
