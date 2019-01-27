@@ -23,6 +23,9 @@ public class PinkLogic : MonoBehaviour
     [Range(0.0f, 1.0f)]
     public float spawnMimicChance;
 
+    [Range(0.0f, 1.0f)]
+    public float doNothingChance;
+
     public float runDistance;
     public float winDistance;
 
@@ -44,13 +47,15 @@ public class PinkLogic : MonoBehaviour
     {
         WaitThenRun,
         SpawnLight,
-        SpawnMimic
+        SpawnMimic,
+        DoNothing
     }
 
     private int pinkRoomIndex;
     private PinkStateMachine stateMachine;
     private GameObject playerGameObject;
     private Random pinkRandom;
+    private bool finalActionTaken;
 
     public Vector3[] GetRoomTraversalPath()
     {
@@ -101,7 +106,7 @@ public class PinkLogic : MonoBehaviour
         {
             if (agent.remainingDistance < 0.1f)
             {
-                if (pinkRoomIndex >= roomTraversals.Length - 1)
+                if (pinkRoomIndex >= roomTraversals.Length)
                 {
                     stateMachine = PinkStateMachine.AwaitingPlayerToWin;
                 }
@@ -121,6 +126,9 @@ public class PinkLogic : MonoBehaviour
                         case PinkAction.SpawnMimic:
                             SpawnMimic();
                             break;
+                        case PinkAction.DoNothing:
+                            // Debug.Log("Doing nothing");
+                            break;
                     }
 
                     if (action != PinkAction.WaitThenRun)
@@ -139,9 +147,11 @@ public class PinkLogic : MonoBehaviour
         }
         else if (stateMachine == PinkStateMachine.AwaitingPlayerToWin)
         {
-            if (Vector3.Distance(playerGameObject.transform.position, transform.position) < winDistance)
+            if (!finalActionTaken && Vector3.Distance(playerGameObject.transform.position, transform.position) < winDistance)
             {
-                if (GetChanceResult() > winChance)
+                finalActionTaken = true;
+                agent.enabled = false;
+                if (GetChanceResult() < winChance)
                 {
                     Win();
                 }
@@ -151,7 +161,6 @@ public class PinkLogic : MonoBehaviour
                 }
             }
         }
-
     }
 
     void GoToNextPoint()
@@ -261,6 +270,12 @@ public class PinkLogic : MonoBehaviour
             return PinkAction.SpawnMimic;
         }
         upto += spawnMimicChance;
+
+        if (upto + doNothingChance >= result)
+        {
+            return PinkAction.DoNothing;
+        }
+        upto += doNothingChance;
 
         throw new ArithmeticException("Should Never Get Here, Math does not work like that!");
     }
