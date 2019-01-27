@@ -3,17 +3,52 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = System.Random;
 
 public class PinkLogic : MonoBehaviour
 {
     public MapGenerator mapGenerator;
 
+    [Range(0.0f, 1.0f)]
+    public float winChance;
+
+    [Range(0.0f, 1.0f)]
+    public float waitForPlayerChance;
+
+    [Range(0.0f, 1.0f)]
+    public float spawnLightChance;
+
+    [Range(0.0f, 1.0f)]
+    public float spawnMimicChance;
+
+    public float runDistance;
+    public float winDistance;
+
     private NavMeshAgent agent;
     private bool setDestinationOnce;
-    private bool extractCornersOnce;
 
     private Vector3[] corners;
     private Vector3[] roomTraversals;
+
+    enum PinkStateMachine
+    {
+        StartUp,
+        MovingToPoint,
+        AwaitingPlayerToRun,
+        AwaitingPlayerToWin
+    }
+
+    enum PinkAction
+    {
+        WaitThenRun,
+        SpawnLight,
+        SpawnMimic
+    }
+
+    private int pinkRoomIndex;
+    private PinkStateMachine stateMachine;
+    private GameObject playerGameObject;
+    private Random pinkRandom;
 
     public Vector3[] GetRoomTraversalPath()
     {
@@ -28,24 +63,120 @@ public class PinkLogic : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        playerGameObject = GameObject.Find("Player");
         agent = GetComponent<NavMeshAgent>();
+        stateMachine = PinkStateMachine.StartUp;
+        pinkRoomIndex = 1;
+        pinkRandom = new Random(mapGenerator.seed.GetHashCode());
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (stateMachine == PinkStateMachine.StartUp)
+        {
+            setDestinationOnce = false;
+        }
+
         if (agent.enabled && !setDestinationOnce)
         {
             setDestinationOnce = true;
-            agent.SetDestination(mapGenerator.GetExitLocation());
+
+            var path = new NavMeshPath();
+            agent.CalculatePath(mapGenerator.GetExitLocation(), path);
+
+            corners = path.corners;
+
+            roomTraversals = ComputeRoomTraversals(corners, mapGenerator.roomCenters);
+
+            agent.SetDestination(roomTraversals[pinkRoomIndex]);
+            pinkRoomIndex++;
+
+            stateMachine = PinkStateMachine.MovingToPoint;
         }
 
-        if (agent.hasPath && !extractCornersOnce)
+        if (stateMachine == PinkStateMachine.MovingToPoint)
         {
-            extractCornersOnce = true;
-            corners = agent.path.corners;
-            roomTraversals = ComputeRoomTraversals(corners, mapGenerator.roomCenters);
+            if (agent.remainingDistance < 0.1f)
+            {
+                if (pinkRoomIndex >= roomTraversals.Length - 1)
+                {
+                    stateMachine = PinkStateMachine.AwaitingPlayerToWin;
+                }
+                else
+                {
+                    PinkAction action = GetNextAction();
+
+                    switch (action)
+                    {
+                        case PinkAction.WaitThenRun:
+                            stateMachine = PinkStateMachine.AwaitingPlayerToRun;
+                            Debug.Log("Waiting then Running");
+                            break;
+                        case PinkAction.SpawnLight:
+                            SpawnLight();
+                            break;
+                        case PinkAction.SpawnMimic:
+                            SpawnMimic();
+                            break;
+                    }
+
+                    if (action != PinkAction.WaitThenRun)
+                    {
+                        GoToNextPoint();
+                    }
+                }
+            }
         }
+        else if (stateMachine == PinkStateMachine.AwaitingPlayerToRun)
+        {
+            if (Vector3.Distance(playerGameObject.transform.position, transform.position) < runDistance)
+            {
+                GoToNextPoint();
+            }
+        }
+        else if (stateMachine == PinkStateMachine.AwaitingPlayerToWin)
+        {
+            if (Vector3.Distance(playerGameObject.transform.position, transform.position) < winDistance)
+            {
+                if (GetChanceResult() > winChance)
+                {
+                    Win();
+                }
+                else
+                {
+                    NextLevel();
+                }
+            }
+        }
+
+    }
+
+    void GoToNextPoint()
+    {
+        stateMachine = PinkStateMachine.MovingToPoint;
+        agent.SetDestination(roomTraversals[pinkRoomIndex]);
+        pinkRoomIndex++;
+    }
+
+    void SpawnMimic()
+    {
+        Debug.Log("Mimic!");
+    }
+
+    void SpawnLight()
+    {
+        Debug.Log("Light!");
+    }
+
+    void Win()
+    {
+        Debug.Log("You Win!!!");
+    }
+
+    void NextLevel()
+    {
+        Debug.Log("Next Level...");
     }
 
     Vector3[] ComputeRoomTraversals(Vector3[] agentCorners, Vector3[] roomCenters)
@@ -101,7 +232,39 @@ public class PinkLogic : MonoBehaviour
     {
         // DebugDrawRawAgentCornerGizmos();
         DebugDrawRoomTraversalGizmos();
-    }   
+    }
+
+    PinkAction GetNextAction()
+    {
+        float result = GetChanceResult();
+
+        float upto = 0;
+        if (upto + waitForPlayerChance >= result)
+        {
+            return PinkAction.WaitThenRun;
+        }
+        upto += waitForPlayerChance;
+
+        if (upto + spawnLightChance >= result)
+        {
+            return PinkAction.SpawnLight;
+        }
+        upto += spawnLightChance;
+
+        if (upto + spawnMimicChance >= result)
+        {
+            return PinkAction.SpawnMimic;
+        }
+        upto += spawnMimicChance;
+
+        throw new ArithmeticException("Should Never Get Here, Math does not work like that!");
+    }
+
+    float GetChanceResult()
+    {
+        // Note Dividing by 1005 is intended to prevent function from returning 1.0f
+        return pinkRandom.Next(0, 1000) / 1005.0f;
+    }
 }
 
 public static class GameUtilityExtensionMethods
@@ -163,7 +326,6 @@ public static class GameUtilityExtensionMethods
 //    public static Vector3[] InterpolationList(this Vector3 p1, Vector3 p2, int count)
 //    {
 //        List<Vector3> interpolatedCorners = new List<Vector3>();
-//
 //
 //        interpolatedCorners.Add(p1);
 //        interpolatedCorners.Add(Vector3.Lerp(p1, p2, 0.25f));
