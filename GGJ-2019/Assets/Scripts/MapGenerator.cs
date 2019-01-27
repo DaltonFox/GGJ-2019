@@ -647,6 +647,11 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    public Vector3 GetExitLocation()
+    {
+        return CoordToWorldPoint(exitCoord);
+    }
+
     class Room : IComparable
     {
         public List<Coord> tiles;
