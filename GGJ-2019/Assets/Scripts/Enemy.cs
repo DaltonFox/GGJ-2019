@@ -24,7 +24,7 @@ public class Enemy : MonoBehaviour
         {
             killMe();
         }
-        else if (collision.gameObject.name == "Collision Point")
+        else if (collision.gameObject.name == "Collision Point" && drainDamage <= 0)
         {
             player.health -= damage;
             killMe();
@@ -34,8 +34,9 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.name == "Soak Point")
+        if (other.gameObject.name == "Collision Point")
         {
+            print("suckk");
             player.health -= drainDamage;
         }
     }

@@ -24,7 +24,6 @@ public class Projectile : MonoBehaviour
     {
         if (other.gameObject.name != "Collision Point"  && isEnemy == false)
         {
-            //var hit = (GameObject)Instantiate(hitPrefab, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
         else if (other.gameObject.name == "Walls" && isEnemy == true)
