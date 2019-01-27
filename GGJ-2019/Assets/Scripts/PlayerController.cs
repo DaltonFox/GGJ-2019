@@ -231,7 +231,6 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.tag == "Bolt" && !dying)
         {
-            print("Got Hit");
             health -= damageCost;
             Destroy(other.gameObject);
         }

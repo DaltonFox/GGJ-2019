@@ -20,6 +20,7 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerEnter(Collider collision)
     {
+        print(collision.gameObject.name);
         if (collision.gameObject.tag == "Projectile")
         {
             killMe();
@@ -36,7 +37,6 @@ public class Enemy : MonoBehaviour
     {
         if (other.gameObject.name == "Collision Point")
         {
-            print("suckk");
             player.health -= drainDamage;
         }
     }
