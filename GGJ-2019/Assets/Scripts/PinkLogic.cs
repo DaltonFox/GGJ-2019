@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 using Random = System.Random;
 
 public class PinkLogic : MonoBehaviour
@@ -114,6 +115,11 @@ public class PinkLogic : MonoBehaviour
                 {
                     PinkAction action = GetNextAction();
 
+                    if (Vector3.Distance(playerGameObject.transform.position, transform.position) < runDistance)
+                    {
+                        action = PinkAction.DoNothing;
+                    }
+
                     switch (action)
                     {
                         case PinkAction.WaitThenRun:
@@ -189,9 +195,19 @@ public class PinkLogic : MonoBehaviour
         playerGameObject.GetComponent<PlayerController>().canWin = true;
     }
 
+    // TODO: if pink is too close to player, have pink skip to next point
+
     void NextLevel()
     {
-        Debug.Log("Next Level...");
+        float px = playerGameObject.transform.position.x;
+        float py = playerGameObject.transform.position.y;
+        mapGenerator.transform.position = new Vector3(px, py, 0);
+        GameObject.Find("Map Generator Walls").transform.position = mapGenerator.transform.position;
+        mapGenerator.GenerateMap();
+        finalActionTaken = false;
+        pinkRoomIndex = 0;
+        stateMachine = PinkStateMachine.StartUp;
+        winChance += 0.1f;
     }
 
     Vector3[] ComputeRoomTraversals(Vector3[] agentCorners, Vector3[] roomCenters)

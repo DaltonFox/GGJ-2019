@@ -267,9 +267,8 @@ public class PlayerController : MonoBehaviour
         
         Vector3 myPos3 = new Vector3(transform.position.x, transform.position.y, 0);
         Vector3 tPos = new Vector3(target.transform.position.x, target.transform.position.y, 0);
-        if (canWin && Vector3.Distance(target.transform.localPosition, transform.localPosition) < 6)
+        if (canWin && Vector3.Distance(target.transform.position, transform.position) < 6)
         {
-            
             targetDir = tPos - myPos3;
             targetDir.Normalize();
             

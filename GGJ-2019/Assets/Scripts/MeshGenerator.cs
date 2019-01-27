@@ -48,8 +48,6 @@ public class MeshGenerator : MonoBehaviour
         mesh.triangles = triangles.ToArray();
         mesh.RecalculateNormals();
 
-        GenerateNavigationSurfaces();
-
         if (is2D)
         {
             Generate2DColliders();
@@ -58,6 +56,8 @@ public class MeshGenerator : MonoBehaviour
         {
             CreateWallMesh();
         }
+
+        GenerateNavigationSurfaces();
     }
 
     void GenerateNavigationSurfaces()
