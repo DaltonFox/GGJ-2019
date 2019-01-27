@@ -377,6 +377,8 @@ MonoBehaviour:
   seed: 
   useRandomSeed: 1
   randomFillPercent: 59
+  mapAgents:
+  - {fileID: 1617131210}
   smoothingIterations: 2
   wallThresholdSize: 50
   roomThresholdSize: 15
@@ -411,6 +413,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walls: {fileID: 596534348}
   is2D: 0
+  navigationSurfaces:
+  - {fileID: 880128587}
 --- !u!23 &766379709
 MeshRenderer:
   m_ObjectHideFlags: 0

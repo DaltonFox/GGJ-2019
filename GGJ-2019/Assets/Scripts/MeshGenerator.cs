@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class MeshGenerator : MonoBehaviour
@@ -12,6 +13,8 @@ public class MeshGenerator : MonoBehaviour
     public SquareGrid squareGrid;
     public MeshFilter walls;
     public bool is2D;
+
+    public NavMeshSurface[] navigationSurfaces;
 
     List<Vector3> vertices;
     List<int> triangles;
@@ -45,8 +48,7 @@ public class MeshGenerator : MonoBehaviour
         mesh.triangles = triangles.ToArray();
         mesh.RecalculateNormals();
 
-        //NavMeshSurface nms = GameObject.Find("Tester").GetComponent<NavMeshSurface>();
-        //nms.BuildNavMesh();
+        GenerateNavigationSurfaces();
 
         if (is2D)
         {
@@ -55,6 +57,20 @@ public class MeshGenerator : MonoBehaviour
         else
         {
             CreateWallMesh();
+        }
+    }
+
+    void GenerateNavigationSurfaces()
+    {
+        if (navigationSurfaces != null)
+        {
+            for (int i = 0; i < navigationSurfaces.Length; i++)
+            {
+                if (navigationSurfaces[i] != null)
+                {
+                    navigationSurfaces[i].BuildNavMesh();
+                }
+            }
         }
     }
 
@@ -116,7 +132,6 @@ public class MeshGenerator : MonoBehaviour
         wallMesh.triangles = wallTriangles.ToArray();
         walls.mesh = wallMesh;
         wallMesh.RecalculateNormals();
-        
 
         // 3D Collision Style
         MeshCollider[] colliders = walls.gameObject.GetComponents<MeshCollider>();
@@ -127,7 +142,10 @@ public class MeshGenerator : MonoBehaviour
 
         MeshCollider wallCollider = walls.gameObject.AddComponent<MeshCollider>();
         wallCollider.sharedMesh = wallMesh;
-        wallCollider.material = GameObject.Find("Collision Point").GetComponent<SphereCollider>().material;
+        if (SceneManager.GetActiveScene().name != "MapGenerationPlayground")
+        {
+            wallCollider.material = GameObject.Find("Collision Point").GetComponent<SphereCollider>().material;
+        }
     }
 
     void TriangulateSquare(Square square)

@@ -13,6 +13,12 @@ public class AudioManager : MonoBehaviour {
 
     public IEnumerator FadeOut(AudioSource audioSource, float FadeTime)
     {
+        if (audioSource == null)
+        {
+            Debug.LogWarning("FadeOut AudioSource is null, breaking early...");
+            yield break;
+        }
+
         float startVolume = audioSource.volume;
 
         while (audioSource.volume > 0)
@@ -28,6 +34,12 @@ public class AudioManager : MonoBehaviour {
 
     public IEnumerator FadeIn(AudioSource audioSource, float FadeTime)
     {
+        if (audioSource == null)
+        {
+            Debug.LogWarning("FadeIn AudioSource is null, breaking early...");
+            yield break;
+        }
+
         float startVolume = 0.075f;
         audioSource.volume = 0;
         audioSource.Play();

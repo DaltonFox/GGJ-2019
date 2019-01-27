@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 using Random = System.Random;
 
 public class MapGenerator : MonoBehaviour
@@ -28,6 +29,8 @@ public class MapGenerator : MonoBehaviour
 
     [Range(0, 100)]
     public int randomFillPercent;
+
+    public NavMeshAgent[] mapAgents;
 
     public int smoothingIterations;
     public int wallThresholdSize;
@@ -122,14 +125,26 @@ public class MapGenerator : MonoBehaviour
         MeshGenerator meshGenerator = GetComponent<MeshGenerator>();
         meshGenerator.GenerateMesh(borderedMap, 1);
 
-        //GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>().enabled = true;
+        ActivateAgents();
     }
 
-    private List<Room> test;
+    void ActivateAgents()
+    {
+        if (mapAgents != null)
+        {
+            for (int i = 0; i < mapAgents.Length; i++)
+            {
+                if (mapAgents[i] != null)
+                {
+                    mapAgents[i].enabled = true;
+                }
+            }
+        }
+    }
+
     void ProcessMap()
     {
         List<List<Coord>> wallRegions = GetRegions(TileType.Wall);
-        //Debug.Log("Finding Walls...");
         foreach (List<Coord> wallRegion in wallRegions)
         {
             if (wallRegion.Count < wallThresholdSize)
@@ -140,8 +155,7 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("Done.");
-        //Debug.Log("Finding Rooms...");
+
         List<List<Coord>> roomRegions = GetRegions(TileType.Floor);
         List<Room> survivingRooms = new List<Room>();
         foreach (List<Coord> roomRegion in roomRegions)
@@ -158,21 +172,14 @@ public class MapGenerator : MonoBehaviour
                 survivingRooms.Add(new Room(roomRegion, map));
             }
         }
-        //Debug.Log("Done.");
-        test = survivingRooms;
         if (survivingRooms.Count > 0)
         {
-            //Debug.Log("Sorting Rooms...");
             survivingRooms.Sort();
-            //Debug.Log("Done.");
 
             survivingRooms[0].isMainRoom = true;
             survivingRooms[0].isAccessibleFromMainRoom = true;
 
-            //Debug.Log("Connecting Rooms...");
             ConnectClosestRooms(survivingRooms);
-            //Debug.Log("Done.");
-
             ConnectDeadEndsPass(survivingRooms);
         }
     }
@@ -520,7 +527,6 @@ public class MapGenerator : MonoBehaviour
 
     void RandomFillMap()
     {
-        //Debug.Log("Randomly Filling Map...");
         if (useRandomSeed)
         {
             seed = DateTime.UtcNow.ToString();
@@ -543,8 +549,6 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
-
-        //Debug.Log("Done.");
     }
 
     void SmoothMap()
@@ -553,16 +557,6 @@ public class MapGenerator : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-//                int northTileType = (int)GetNeighbor(x, y, NeighborType.North);
-//                int southTileType = (int)GetNeighbor(x, y, NeighborType.South);
-//                int eastTileType = (int)GetNeighbor(x, y, NeighborType.East);
-//                int westTileType = (int)GetNeighbor(x, y, NeighborType.West);
-//
-//                int v1 = northTileType ^ southTileType;
-//                int v2 = eastTileType ^ westTileType;
-//
-//                map[x, y] = (v1 ^ v2) == 1? TileType.Wall : TileType.Floor;
-
                 int neighborWallTiles = GetSurroundingWallCount(x, y);
                 if (neighborWallTiles > 4)
                 {
@@ -635,18 +629,22 @@ public class MapGenerator : MonoBehaviour
 
     void Update()
     {
-        //if (Input.GetMouseButtonDown(0))
-        //{
-        //    GameObject player = GameObject.Find("DummyPlayer");
-        //    player.GetComponent<NavMeshAgent>().enabled = false;
-        //    player.transform.position = new Vector3(0, 0, -2.5f);
-        //    GenerateMap();
-        //}
-        //if (Input.GetMouseButtonDown(1))
-        //{
-        //    NavMeshAgent nma = GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>();
-        //    nma.SetDestination(CoordToWorldPoint(exitCoord));
-        //}
+        if (SceneManager.GetActiveScene().name == "MapGenerationPlayground")
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                GameObject player = GameObject.Find("DummyPlayer");
+                player.GetComponent<NavMeshAgent>().enabled = false;
+                player.transform.position = new Vector3(0, 0, -2.5f);
+                GenerateMap();
+            }
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                NavMeshAgent nma = GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>();
+                nma.SetDestination(CoordToWorldPoint(exitCoord));
+            }
+        }
     }
 
     class Room : IComparable
@@ -758,20 +756,10 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    void OnDrawGizmos()
-    {
-//        if (test != null)
-//        {
-//            Gizmos.color = Color.red;
-//            foreach (Room r in test)
-//            {
-//                Coord c = r.GetCenterPoint();
-//                c.tileX -= width / 2;
-//                c.tileY -= height / 2;
-//                Gizmos.DrawSphere(new Vector3(c.tileX, c.tileY, -5), 1);
-//            }
-//        }
-    }
+//    void OnDrawGizmos()
+//    {
+//
+//    }
 
     void InvertTiles(TileType[,] tileMap)
     {
