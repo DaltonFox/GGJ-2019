@@ -1,5 +1,6 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,7 +9,21 @@ public class PinkLogic : MonoBehaviour
     public MapGenerator mapGenerator;
 
     private NavMeshAgent agent;
-    private bool once;
+    private bool setDestinationOnce;
+    private bool extractCornersOnce;
+
+    private Vector3[] corners;
+    private Vector3[] roomTraversals;
+
+    public Vector3[] GetRoomTraversalPath()
+    {
+        return roomTraversals;
+    }
+
+    public Vector3 GetClosestRoom()
+    {
+        return transform.position.ClosestTo(roomTraversals);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -19,10 +34,143 @@ public class PinkLogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (agent.enabled && !once)
+        if (agent.enabled && !setDestinationOnce)
         {
-            once = true;
+            setDestinationOnce = true;
             agent.SetDestination(mapGenerator.GetExitLocation());
         }
+
+        if (agent.hasPath && !extractCornersOnce)
+        {
+            extractCornersOnce = true;
+            corners = agent.path.corners;
+            roomTraversals = ComputeRoomTraversals(corners, mapGenerator.roomCenters);
+        }
     }
+
+    Vector3[] ComputeRoomTraversals(Vector3[] agentCorners, Vector3[] roomCenters)
+    {
+        HashSet<Vector3> rooms = new HashSet<Vector3>();
+
+        List<Vector3> interpolatedCorners = new List<Vector3>();
+        for (int i = 0; i < agentCorners.Length - 1; i++)
+        {
+            Vector3 p1 = agentCorners[i + 0];
+            Vector3 p2 = agentCorners[i + 1];
+
+            interpolatedCorners.Add(p1);
+            interpolatedCorners.Add(Vector3.Lerp(p1, p2, 0.25f));
+            interpolatedCorners.Add(Vector3.Lerp(p1, p2, 0.50f));
+            interpolatedCorners.Add(Vector3.Lerp(p1, p2, 0.75f));
+            interpolatedCorners.Add(p2);
+        }
+
+        foreach (Vector3 corner in interpolatedCorners)
+        {
+            rooms.Add(corner.ClosestTo(roomCenters));
+        }
+
+        return rooms.ToArray();
+    }
+
+    void DebugDrawRawAgentCornerGizmos()
+    {
+        if (corners != null)
+        {
+            Gizmos.color = new Color(1, 0, 1);
+            for (int i = 0; i < corners.Length; i++)
+            {
+                Gizmos.DrawSphere(corners[i], 1);
+            }
+        }
+    }
+
+    void DebugDrawRoomTraversalGizmos()
+    {
+        if (roomTraversals != null)
+        {
+            Gizmos.color = Color.green;
+            for (int i = 0; i < roomTraversals.Length; i++)
+            {
+                Gizmos.DrawSphere(roomTraversals[i], 2);
+            }
+        }
+    }
+
+    void OnDrawGizmos()
+    {
+        // DebugDrawRawAgentCornerGizmos();
+        DebugDrawRoomTraversalGizmos();
+    }   
+}
+
+public static class GameUtilityExtensionMethods
+{
+    public static int DistanceSquaredAsInt(this Vector3 src, Vector3 other)
+    {
+        int x1 = (int)src.x;
+        int x2 = (int)other.x;
+        int y1 = (int)src.y;
+        int y2 = (int)other.y;
+        int z1 = (int)src.z;
+        int z2 = (int)other.z;
+
+        int p1 = x1 - x2;
+        int p2 = y1 - y2;
+        int p3 = z1 - z2;
+
+        p1 *= p1;
+        p2 *= p2;
+        p3 *= p3;
+
+        return p1 + p2 + p3;
+    }
+
+    public static float DistanceSquaredAsFloat(this Vector3 src, Vector3 other)
+    {
+        float p1 = src.x - other.x;
+        float p2 = src.y - other.y;
+        float p3 = src.z - other.z;
+
+        p1 *= p1;
+        p2 *= p2;
+        p3 *= p3;
+
+        return p1 + p2 + p3;
+    }
+
+    public static Vector3 ClosestTo(this Vector3 src, Vector3[] others)
+    {
+        if (others.Length == 0)
+        {
+            throw new ArgumentException("Vector3 cannot be closest to any point in a list of 0 points!");
+        }
+
+        Vector3 best = Vector3.zero;
+        int bestDistance = Int32.MaxValue;
+        foreach (Vector3 point in others)
+        {
+            int distanceSquaredBetweenPoints = src.DistanceSquaredAsInt(point);
+            if (distanceSquaredBetweenPoints < bestDistance)
+            {
+                bestDistance = distanceSquaredBetweenPoints;
+                best = point;
+            }
+        }
+        return best;
+    }
+
+//    public static Vector3[] InterpolationList(this Vector3 p1, Vector3 p2, int count)
+//    {
+//        List<Vector3> interpolatedCorners = new List<Vector3>();
+//
+//
+//        interpolatedCorners.Add(p1);
+//        interpolatedCorners.Add(Vector3.Lerp(p1, p2, 0.25f));
+//        interpolatedCorners.Add(Vector3.Lerp(p1, p2, 0.50f));
+//        interpolatedCorners.Add(Vector3.Lerp(p1, p2, 0.75f));
+//        interpolatedCorners.Add(p2);
+//
+//        return interpolatedCorners.ToArray();
+//    }
 }

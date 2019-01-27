@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 using Random = System.Random;
 
 public class MapGenerator : MonoBehaviour
@@ -39,13 +41,15 @@ public class MapGenerator : MonoBehaviour
     public int passagewayRadius = 1;
     public int specialZoneRadius = 12;
 
+    public Vector3[] roomCenters;
+
     Coord exitCoord = new Coord(0, 0);
 
     TileType[,] map;
 
     void Start()
     {
-        GenerateMap();        
+        GenerateMap();
     }
 
     void GenerateMap()
@@ -53,8 +57,11 @@ public class MapGenerator : MonoBehaviour
         SetAgentStates(false);
 
         map = new TileType[width, height];
+        
+        // Maps starts by being filled with noise
         RandomFillMap();
 
+        // Cellular Automaton Smoothing
         for (int i = 0; i < smoothingIterations; i++)
         {
             SmoothMap();
@@ -63,9 +70,9 @@ public class MapGenerator : MonoBehaviour
         // draw the spawn
         DrawCircle(new Coord(width / 2, height / 2), specialZoneRadius);
 
+        // determine map exit location
         Random rng = new Random(seed.GetHashCode());
         int exitPlace = rng.Next(0, 7);
-        
         switch (exitPlace)
         {
             case 0:
@@ -103,8 +110,10 @@ public class MapGenerator : MonoBehaviour
         // draw the exit location
         DrawCircle(exitCoord, specialZoneRadius);
 
+        // Ensure Connectivity Between Rooms (Longest Part of Map Generation)
         ProcessMap();
 
+        // Add Border to Map to Make Sure the Player Cannot Escape
         TileType[,] borderedMap = new TileType[width + borderSize * 2, height + borderSize * 2];
         for (int x = 0; x < borderedMap.GetLength(0); x++)
         {
@@ -122,15 +131,15 @@ public class MapGenerator : MonoBehaviour
         }
 
         // DebugMap(borderedMap);
-        // InvertTiles(borderedMap);
 
+        // Floor Mesh Generation, Marching Squares Smoothing, Wall Mesh Generation
         MeshGenerator meshGenerator = GetComponent<MeshGenerator>();
         meshGenerator.GenerateMesh(borderedMap, 1);
 
         SetAgentStates(true);
     }
 
-    void SetAgentStates(bool enabled)
+    void SetAgentStates(bool agentEnabled)
     {
         if (mapAgents != null)
         {
@@ -138,7 +147,7 @@ public class MapGenerator : MonoBehaviour
             {
                 if (mapAgents[i] != null)
                 {
-                    mapAgents[i].enabled = enabled;
+                    mapAgents[i].enabled = agentEnabled;
                 }
             }
         }
@@ -183,6 +192,12 @@ public class MapGenerator : MonoBehaviour
 
             ConnectClosestRooms(survivingRooms);
             ConnectDeadEndsPass(survivingRooms);
+
+            roomCenters = new Vector3[survivingRooms.Count];
+            for(int i = 0; i < survivingRooms.Count; i++)
+            {
+                roomCenters[i] = CoordToWorldPoint(survivingRooms[i].GetCenterPoint());
+            }
         }
     }
 
@@ -667,6 +682,11 @@ public class MapGenerator : MonoBehaviour
 
         public Coord GetCenterPoint()
         {
+            if (tiles.Count == 0)
+            {
+                return new Coord(0, 0);
+            }
+
             if (centerPoint.tileX == Int32.MaxValue)
             {
                 int x = 0;
@@ -765,19 +785,15 @@ public class MapGenerator : MonoBehaviour
 
 //    void OnDrawGizmos()
 //    {
-//
+//        if (roomCenters != null)
+//        {
+//            Gizmos.color = Color.red;
+//            for (int i = 0; i < roomCenters.Length; i++)
+//            {
+//                Gizmos.DrawSphere(roomCenters[i], 1);
+//            }
+//        }
 //    }
-
-    void InvertTiles(TileType[,] tileMap)
-    {
-        for (int x = 0; x < tileMap.GetLength(0); x++)
-        {
-            for (int y = 0; y < tileMap.GetLength(1); y++)
-            {
-                tileMap[x, y] = tileMap[x, y] == TileType.Wall ? TileType.Floor : TileType.Wall;
-            }
-        }
-    }
 
     void DebugMap(TileType[,] tileMap)
     {

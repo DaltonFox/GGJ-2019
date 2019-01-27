@@ -150,6 +150,7 @@ public class MeshGenerator : MonoBehaviour
 
     void TriangulateSquare(Square square)
     {
+        // It would be nice to do a look-up table for this at some point: https://en.wikipedia.org/wiki/Marching_squares
         switch (square.configuration)
         {
             // 0 points
