@@ -164,7 +164,7 @@ public class PlayerController : MonoBehaviour
             stepSequenceTransition();
             yield return null;
         }
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene("MenuScene");
     }
 
     void startEnd()
