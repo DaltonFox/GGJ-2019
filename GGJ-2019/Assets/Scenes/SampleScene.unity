@@ -848,9 +848,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapGenerator: {fileID: 1756117854}
+  pinkPathLightPrefab: {fileID: 3349883601421926619, guid: 9ec8e0cb34bb5c545bd5fe90ddb36407,
+    type: 3}
   winChance: 0.1
-  waitForPlayerChance: 0.6
-  spawnLightChance: 0.25
+  waitForPlayerChance: 0.1
+  spawnLightChance: 0.75
   spawnMimicChance: 0.15
   runDistance: 18
   winDistance: 6

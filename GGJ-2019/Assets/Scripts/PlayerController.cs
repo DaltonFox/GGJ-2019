@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
     private float admission;
     private AudioSource soundMaker;
     public AudioClip shootSound;
+    public bool canwin;
 
     void Start()
     {
@@ -201,7 +202,7 @@ public class PlayerController : MonoBehaviour
         
         Vector3 myPos3 = new Vector3(transform.position.x, transform.position.y, 0);
         Vector3 tPos = new Vector3(target.transform.position.x, target.transform.position.y, 0);
-        if (Vector3.Distance(myPos3, tPos) < 6.0f)
+        if (canwin)
         {
             
             targetDir = tPos - myPos3;

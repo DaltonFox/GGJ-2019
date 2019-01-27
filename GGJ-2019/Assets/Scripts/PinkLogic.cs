@@ -9,6 +9,8 @@ public class PinkLogic : MonoBehaviour
 {
     public MapGenerator mapGenerator;
 
+    public GameObject pinkPathLightPrefab;
+
     [Range(0.0f, 1.0f)]
     public float winChance;
 
@@ -111,7 +113,7 @@ public class PinkLogic : MonoBehaviour
                     {
                         case PinkAction.WaitThenRun:
                             stateMachine = PinkStateMachine.AwaitingPlayerToRun;
-                            Debug.Log("Waiting then Running");
+                            // Debug.Log("Waiting then Running");
                             break;
                         case PinkAction.SpawnLight:
                             SpawnLight();
@@ -166,12 +168,15 @@ public class PinkLogic : MonoBehaviour
 
     void SpawnLight()
     {
-        Debug.Log("Light!");
+        Vector3 position = transform.position;
+        position.z = -5;
+        Instantiate(pinkPathLightPrefab, position, Quaternion.identity);
     }
 
     void Win()
     {
         Debug.Log("You Win!!!");
+        playerGameObject.GetComponent<PlayerController>().canwin = true;
     }
 
     void NextLevel()
