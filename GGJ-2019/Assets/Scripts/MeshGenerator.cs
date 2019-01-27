@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 public class MeshGenerator : MonoBehaviour
@@ -39,58 +40,13 @@ public class MeshGenerator : MonoBehaviour
 
         Mesh mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-        //HashSet<int> seen = new HashSet<int>();
-        //System.Random r = new System.Random(DateTime.UtcNow.Millisecond);
-        //for(int i = 0; i < triangles.Count / 3; i++)
-        //{
-        //    float amt = r.Next(0, 1000) / 2000.0f;
-        //    int a = triangles[i * 3 + 0];
-        //    int b = triangles[i * 3 + 1];
-        //    int c = triangles[i * 3 + 2];
-
-        //    if (seen.Contains(a) || seen.Contains(b) || seen.Contains(c))
-        //    {
-        //        continue;
-        //    }
-
-        //    seen.Add(a);
-        //    seen.Add(b);
-        //    seen.Add(c);
-
-        //    float zAmt = amt * (r.Next(0, 1) == 1 ? 1 : -1);
-            
-        //    Vector3 y = vertices[a];
-        //    //y.z += zAmt;
-        //    vertices[a] = y;
-
-        //    y = vertices[b];
-        //    //y.z += zAmt;
-        //    vertices[b] = y;
-
-        //    y = vertices[c];
-        //    //y.z += zAmt;
-        //    vertices[c] = y;
-        //}
-
-//        using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Users\miner\Desktop\GGJ-2019\debugModel.obj"))
-//        {
-//            foreach (Vector3 vertex in vertices)
-//            {
-//                file.WriteLine("v " + vertex.x + " " + vertex.y + " " + vertex.z);
-//            }
-//
-//            for (int i = 0; i < triangles.Count / 3; i++)
-//            {
-//                int a = triangles[i * 3 + 0] + 1;
-//                int b = triangles[i * 3 + 1] + 1;
-//                int c = triangles[i * 3 + 2] + 1;
-//                file.WriteLine("f " + a + " " + b + " " + c);
-//            }
-//        }
 
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
         mesh.RecalculateNormals();
+
+        NavMeshSurface nms = GameObject.Find("Tester").GetComponent<NavMeshSurface>();
+        nms.BuildNavMesh();
 
         if (is2D)
         {
@@ -232,7 +188,11 @@ public class MeshGenerator : MonoBehaviour
 
             // 4 points
             case 15:
-                MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.bottomLeft);
+                //MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.bottomLeft);
+
+                MeshFromPoints(square.topLeft, square.topRight, square.bottomRight);
+                MeshFromPoints(square.topLeft, square.bottomRight, square.bottomLeft);
+
                 checkedVertices.Add(square.topLeft.vertexIndex);
                 checkedVertices.Add(square.topRight.vertexIndex);
                 checkedVertices.Add(square.bottomRight.vertexIndex);
