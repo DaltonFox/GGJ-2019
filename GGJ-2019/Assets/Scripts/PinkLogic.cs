@@ -151,6 +151,7 @@ public class PinkLogic : MonoBehaviour
             {
                 finalActionTaken = true;
                 agent.enabled = false;
+
                 if (GetChanceResult() < winChance)
                 {
                     Win();
@@ -185,7 +186,7 @@ public class PinkLogic : MonoBehaviour
     void Win()
     {
         Debug.Log("You Win!!!");
-        playerGameObject.GetComponent<PlayerController>().canwin = true;
+        playerGameObject.GetComponent<PlayerController>().canWin = true;
     }
 
     void NextLevel()

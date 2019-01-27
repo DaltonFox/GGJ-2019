@@ -71,6 +71,11 @@ public class AudioManager : MonoBehaviour {
         StartCoroutine(FadeIn(mainLoopSource, 2f));
     }
 
+    public void startFade()
+    {
+        currentVolume = volumeLevels[1];
+        StartCoroutine(FadeOut(mainLoopSource, 1.55f));
+    }
     public void startEndLoop()
     {
         currentVolume = volumeLevels[1];
