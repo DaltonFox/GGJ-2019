@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = System.Random;
 
 public class MapGenerator : MonoBehaviour
@@ -35,6 +36,8 @@ public class MapGenerator : MonoBehaviour
     public int passagewayRadius = 1;
     public int specialZoneRadius = 12;
 
+    Coord exitCoord = new Coord(0, 0);
+
     TileType[,] map;
 
     void Start()
@@ -60,7 +63,7 @@ public class MapGenerator : MonoBehaviour
 
         Random rng = new Random(seed.GetHashCode());
         int exitPlace = rng.Next(0, 7);
-        Coord exitCoord = new Coord(0, 0);
+        
         switch (exitPlace)
         {
             case 0:
@@ -127,6 +130,8 @@ public class MapGenerator : MonoBehaviour
         Debug.Log("Generating Mesh...");
         meshGenerator.GenerateMesh(borderedMap, 1);
         Debug.Log("Done.");
+
+        GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>().enabled = true;
     }
 
     private List<Room> test;
@@ -641,7 +646,16 @@ public class MapGenerator : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            GameObject player = GameObject.Find("DummyPlayer");
+            player.GetComponent<NavMeshAgent>().enabled = false;
+            player.transform.position = new Vector3(0, 0, -2.5f);
             GenerateMap();
+        }
+        if (Input.GetMouseButtonDown(1))
+        {
+            NavMeshAgent nma = GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>();
+            nma.SetDestination(CoordToWorldPoint(exitCoord));
+            Debug.Log("Here");
         }
     }
 
