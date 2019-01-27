@@ -22,7 +22,7 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.name != "Collision Point" && isEnemy == false)
+        if (other.gameObject.name != "Collision Point"  && isEnemy == false)
         {
             //var hit = (GameObject)Instantiate(hitPrefab, transform.position, Quaternion.identity);
             Destroy(gameObject);

@@ -220,6 +220,7 @@ public class PlayerController : MonoBehaviour
         }
         if (collision.gameObject.tag == "Bolt")
         {
+            print("Got Hit");
             health -= damageCost;
             Destroy(collision.gameObject);
         }
@@ -231,6 +232,7 @@ public class PlayerController : MonoBehaviour
             health -= drainCost * wallDamageModifier * 10;
         }
     }
+
     private bool dying = false;
     void Update()
     {

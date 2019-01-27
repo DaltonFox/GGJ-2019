@@ -31,8 +31,8 @@ public class Range : MonoBehaviour
     {
         if (reload > 0)
             reload -= Time.deltaTime;
-
-        if (Vector3.Distance(target.transform.localPosition, transform.localPosition) < 12 && reload <= 0 && canShoot)
+        var dist = Vector3.Distance(target.transform.position, gameObject.transform.position);
+        if ((dist <= 13) && (reload <= 0) && canShoot)
         {
             shoot.pitch = Random.Range(0.975f, 1.25f);
             shoot.Play();
