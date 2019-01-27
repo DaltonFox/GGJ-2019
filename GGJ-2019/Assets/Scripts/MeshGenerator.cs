@@ -116,6 +116,7 @@ public class MeshGenerator : MonoBehaviour
         wallMesh.triangles = wallTriangles.ToArray();
         walls.mesh = wallMesh;
         wallMesh.RecalculateNormals();
+        
 
         // 3D Collision Style
         MeshCollider[] colliders = walls.gameObject.GetComponents<MeshCollider>();
@@ -126,6 +127,7 @@ public class MeshGenerator : MonoBehaviour
 
         MeshCollider wallCollider = walls.gameObject.AddComponent<MeshCollider>();
         wallCollider.sharedMesh = wallMesh;
+        wallCollider.material = GameObject.Find("Collision Point").GetComponent<SphereCollider>().material;
     }
 
     void TriangulateSquare(Square square)

@@ -47,16 +47,13 @@ public class MapGenerator : MonoBehaviour
 
     void GenerateMap()
     {
-        Debug.Log("Starting Map Generation...");
         map = new TileType[width, height];
         RandomFillMap();
 
-        Debug.Log("Smoothing Map...");
         for (int i = 0; i < smoothingIterations; i++)
         {
             SmoothMap();
         }
-        Debug.Log("Done.");
 
         // draw the spawn
         DrawCircle(new Coord(width / 2, height / 2), specialZoneRadius);
@@ -101,11 +98,8 @@ public class MapGenerator : MonoBehaviour
         // draw the exit location
         DrawCircle(exitCoord, specialZoneRadius);
 
-        Debug.Log("Processing Map...");
         ProcessMap();
-        Debug.Log("Done.");
 
-        Debug.Log("Adding Borders...");
         TileType[,] borderedMap = new TileType[width + borderSize * 2, height + borderSize * 2];
         for (int x = 0; x < borderedMap.GetLength(0); x++)
         {
@@ -121,15 +115,12 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
-        Debug.Log("Done.");
 
         // DebugMap(borderedMap);
         // InvertTiles(borderedMap);
 
         MeshGenerator meshGenerator = GetComponent<MeshGenerator>();
-        Debug.Log("Generating Mesh...");
         meshGenerator.GenerateMesh(borderedMap, 1);
-        Debug.Log("Done.");
 
         GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>().enabled = true;
     }
@@ -138,7 +129,7 @@ public class MapGenerator : MonoBehaviour
     void ProcessMap()
     {
         List<List<Coord>> wallRegions = GetRegions(TileType.Wall);
-        Debug.Log("Finding Walls...");
+        //Debug.Log("Finding Walls...");
         foreach (List<Coord> wallRegion in wallRegions)
         {
             if (wallRegion.Count < wallThresholdSize)
@@ -149,8 +140,8 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
-        Debug.Log("Done.");
-        Debug.Log("Finding Rooms...");
+        //Debug.Log("Done.");
+        //Debug.Log("Finding Rooms...");
         List<List<Coord>> roomRegions = GetRegions(TileType.Floor);
         List<Room> survivingRooms = new List<Room>();
         foreach (List<Coord> roomRegion in roomRegions)
@@ -167,20 +158,20 @@ public class MapGenerator : MonoBehaviour
                 survivingRooms.Add(new Room(roomRegion, map));
             }
         }
-        Debug.Log("Done.");
+        //Debug.Log("Done.");
         test = survivingRooms;
         if (survivingRooms.Count > 0)
         {
-            Debug.Log("Sorting Rooms...");
+            //Debug.Log("Sorting Rooms...");
             survivingRooms.Sort();
-            Debug.Log("Done.");
+            //Debug.Log("Done.");
 
             survivingRooms[0].isMainRoom = true;
             survivingRooms[0].isAccessibleFromMainRoom = true;
 
-            Debug.Log("Connecting Rooms...");
+            //Debug.Log("Connecting Rooms...");
             ConnectClosestRooms(survivingRooms);
-            Debug.Log("Done.");
+            //Debug.Log("Done.");
 
             ConnectDeadEndsPass(survivingRooms);
         }
@@ -529,7 +520,7 @@ public class MapGenerator : MonoBehaviour
 
     void RandomFillMap()
     {
-        Debug.Log("Randomly Filling Map...");
+        //Debug.Log("Randomly Filling Map...");
         if (useRandomSeed)
         {
             seed = DateTime.UtcNow.ToString();
@@ -553,7 +544,7 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
-        Debug.Log("Done.");
+        //Debug.Log("Done.");
     }
 
     void SmoothMap()
@@ -655,7 +646,6 @@ public class MapGenerator : MonoBehaviour
         {
             NavMeshAgent nma = GameObject.Find("DummyPlayer").GetComponent<NavMeshAgent>();
             nma.SetDestination(CoordToWorldPoint(exitCoord));
-            Debug.Log("Here");
         }
     }
 
