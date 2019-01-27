@@ -1037,10 +1037,18 @@ MonoBehaviour:
   map: {fileID: 1756117850}
   pink: {fileID: 1063127193}
   player: {fileID: 1356988326}
+  ghastPrefab: {fileID: 6531615975935938726, guid: 9310e25474aba7f48960eca7956eb0fe,
+    type: 3}
+  oraclePrefab: {fileID: 1895027629803426153, guid: ca90a569b5e93124fa1030d0870fa364,
+    type: 3}
+  squarePrefab: {fileID: 6040156995346221723, guid: 659b5e82d5d35b446a7a61b29eada48e,
+    type: 3}
   maxAliveEnemies: 20
   ghastSpawnChance: 0.25
   oracleSpawnChance: 0.5
   squareSpawnChance: 0.25
+  spawnAtPinkChance: 0.4
+  spawnInterval: 2
 --- !u!4 &1852572982
 Transform:
   m_ObjectHideFlags: 0

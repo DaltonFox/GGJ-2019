@@ -34,6 +34,7 @@ public class PinkLogic : MonoBehaviour
 
     private Vector3[] corners;
     private Vector3[] roomTraversals;
+    private EnemySpawner enemySpawner;
 
     enum PinkStateMachine
     {
@@ -75,6 +76,7 @@ public class PinkLogic : MonoBehaviour
         stateMachine = PinkStateMachine.StartUp;
         pinkRoomIndex = 1;
         pinkRandom = new Random(mapGenerator.seed.GetHashCode());
+        enemySpawner = GameObject.Find("EnemySpawner").GetComponent<EnemySpawner>();
     }
 
     // Update is called once per frame
@@ -157,6 +159,9 @@ public class PinkLogic : MonoBehaviour
                 finalActionTaken = true;
                 agent.enabled = false;
 
+                enemySpawner.StopSpawner();
+                enemySpawner.KillAllSpawned();
+
                 if (GetChanceResult() < winChance)
                 {
                     Win();
@@ -194,8 +199,6 @@ public class PinkLogic : MonoBehaviour
         playerGameObject.GetComponent<PlayerController>().canWin = true;
     }
 
-    // TODO: if pink is too close to player, have pink skip to next point
-
     void NextLevel()
     {
         float px = playerGameObject.transform.position.x;
@@ -207,6 +210,7 @@ public class PinkLogic : MonoBehaviour
         pinkRoomIndex = 0;
         stateMachine = PinkStateMachine.StartUp;
         winChance += 0.1f;
+        enemySpawner.StartSpawner();
     }
 
     Vector3[] ComputeRoomTraversals(Vector3[] agentCorners, Vector3[] roomCenters)
@@ -340,7 +344,7 @@ public static class GameUtilityExtensionMethods
 
     public static Vector3 ClosestTo(this Vector3 src, Vector3[] others)
     {
-        if (others.Length == 0)
+        if (others == null || others.Length == 0)
         {
             throw new ArgumentException("Vector3 cannot be closest to any point in a list of 0 points!");
         }
