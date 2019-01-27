@@ -166,6 +166,8 @@ public class PlayerController : MonoBehaviour
     public float shotCost = 0.01f;
     public float damageCost = 0.05f;
     public float wallDamageModifier = 25;
+    public AudioClip pickUpSound;
+    public AudioClip hitSound;
 
     private GameObject spirit;
 
@@ -231,8 +233,22 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.tag == "Bolt" && !dying)
         {
+            soundMaker.pitch = Random.Range(0.85f, 1.15f);
+            soundMaker.volume = 0.25f;
+            soundMaker.PlayOneShot(hitSound);
             health -= damageCost;
             Destroy(other.gameObject);
+        }
+        if (other.gameObject.tag == "pickup")
+        {
+            soundMaker.volume = 0.25f;
+            soundMaker.PlayOneShot(pickUpSound);
+            health += 0.5f;
+            if (health > 1.5f)
+            {
+                health = 1.5f;
+            }
+            Destroy(other.transform.parent.gameObject);
         }
     }
 
