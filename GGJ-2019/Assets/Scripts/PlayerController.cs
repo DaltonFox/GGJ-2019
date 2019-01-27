@@ -218,18 +218,21 @@ public class PlayerController : MonoBehaviour
         {
             health -= drainCost * wallDamageModifier * 10;
         }
-        if (collision.gameObject.tag == "Bolt")
-        {
-            print("Got Hit");
-            health -= damageCost;
-            Destroy(collision.gameObject);
-        }
     }
     private void OnCollisionExit(Collision collision)
     {
         if (collision.gameObject.name == "Map Generator Walls")
         {
             health -= drainCost * wallDamageModifier * 10;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Bolt" && !dying)
+        {
+            health -= damageCost;
+            Destroy(other.gameObject);
         }
     }
 

@@ -4896,6 +4896,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitPrefab: {fileID: 1333594661644052398, guid: bc5e1f7c336370e43aa6e113cbdbcc6e,
     type: 3}
+  isEnemy: 0
 --- !u!135 &1534076424095431268
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4907,7 +4908,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.25
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4739879133006875806
 GameObject:
